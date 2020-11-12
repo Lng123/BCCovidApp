@@ -10,8 +10,7 @@ const dataSchema = new Schema({
   Classification_Reported: { type: String },
 });
 
-const Data = mongoose.model("Data", dataSchema);
-
+const Data = mongoose.model("Data", dataSchema, "Data");
 module.exports = {
   Data,
 };
