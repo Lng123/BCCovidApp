@@ -4,9 +4,11 @@ import { StyleSheet, Text, View } from "react-native";
 import axios from "axios";
 
 class MainStats extends Component {
+    
     constructor(props) {
         super(props);
         this.state = {
+            savedData: {},
             reportedDate: 1,
             ha: 2,
             sex: 3,
@@ -15,23 +17,35 @@ class MainStats extends Component {
         };
     }
 
-    loadData() { }
-
-    componentDidMount() {
-        console.log("hey guys");
+    loadData() { 
+        console.log("loadData()");
         axios
             .get("http://localhost:5000/data/", { withCredentials: true })
             .then((response) => {
-                console.log(response.data);
-                this.setState({
-                    reportedDate: response.data[0].Reported_Date,
-                    ha: response.data[0].HA,
-                    sex: response.data[0].Sex,
-                    ageGroup: response.data[0].Age_Group,
-                    classification: response.data[0].Classification_Reported
-                });
+                //console.log(response.data);
+                this.setState({savedData : response.data});
+                console.log("setState")
+                console.log(this.state.savedData);
+                this.searchInData()
             });
     }
+
+    componentDidMount() {
+      this.loadData();
+    }
+
+    searchInData(){
+      console.log("searchInData()");
+      console.log(this.state.savedData)
+      this.setState({
+        reportedDate : this.state.savedData[0].Reported_Date,
+        ha: this.state.savedData[0].HA,
+        sex: this.state.savedData[0].Sex,
+        ageGroup: this.state.savedData[0].Age_Group,
+        classification: this.state.savedData[0].Classification_Reported
+      })
+    }
+
 
     render() {
         return (
