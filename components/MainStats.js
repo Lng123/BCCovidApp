@@ -24,36 +24,26 @@ class MainStats extends Component {
             .then((response) => {
                 //console.log(response.data);
                 this.setState({savedData : response.data});
-                console.log("1 state  saved data")
+                console.log("setState")
                 console.log(this.state.savedData);
-                console.log("2 state  saved data")
-            }).then(this.searchInData());
+                this.searchInData()
+            });
     }
 
     componentDidMount() {
       this.loadData();
-        /*console.log("hey guys");
-        axios
-            .get("http://localhost:5000/data/", { withCredentials: true })
-            .then((response) => {
-                //console.log(response.data);
-                this.setState({savedData : response.data}).catch((error)=>{
-                  console.log(error);
-               });;
-            }).then(this.searchInData());*/
-        
     }
 
     searchInData(){
-      console.log("3 searchInData()");
+      console.log("searchInData()");
       console.log(this.state.savedData)
-      /*this.setState({
-        reportedDate : savedData[0].Reported_Date,
-        ha: savedData[0].HA,
-        sex: savedData[0].Sex,
-        ageGroup: savedData[0].Age_Group,
-        classification: savedData[0].Classification_Reported
-      })*/
+      this.setState({
+        reportedDate : this.state.savedData[0].Reported_Date,
+        ha: this.state.savedData[0].HA,
+        sex: this.state.savedData[0].Sex,
+        ageGroup: this.state.savedData[0].Age_Group,
+        classification: this.state.savedData[0].Classification_Reported
+      })
     }
 
 
