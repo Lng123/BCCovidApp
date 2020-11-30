@@ -24,15 +24,19 @@ class MainStats extends Component {
             .then((response) => {
                 //console.log(response.data);
                 this.setState({savedData : response.data});
-                console.log("setState")
+                console.log("setState");
                 console.log(this.state.savedData);
-                this.searchInData()
+                this.searchInData();
+                this.filterData();
             });
     }
 
     componentDidMount() {
       this.loadData();
     }
+    /*componentDidUpdate(){
+      this.filterData();
+    }*/
 
     searchInData(){
       console.log("searchInData()");
@@ -46,6 +50,27 @@ class MainStats extends Component {
       })
     }
 
+    filterData(startDate,endDate){
+      let a = new Date(2020,1,10);
+      let b = new Date(2020,2,10);
+      let start = 0;
+      let end = 1;
+      for(let i = 0;i<this.state.savedData.length;i++){
+        let compareDate = new Date(this.state.savedData[i].Reported_Date)
+        if (compareDate < a ){
+          start = i+1;
+        }
+        
+        if (compareDate < b){
+          end = i;
+        }
+      }
+
+      for(let k = start;k<end;k++){
+        console.log(this.state.savedData[k].Reported_Date)
+      }
+
+    }
 
     render() {
         return (
