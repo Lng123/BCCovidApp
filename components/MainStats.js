@@ -1,6 +1,6 @@
 import { StatusBar } from "expo-status-bar";
 import React, { Component } from "react";
-import { StyleSheet, Text, View, Button } from "react-native";
+import { StyleSheet, Text, View, Button, TouchableWithoutFeedbackBase } from "react-native";
 import axios from "axios";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 
@@ -72,6 +72,11 @@ class MainStats extends Component {
         }
     }
 
+    dateConfirmHandler = (date) => {
+      console.warn("A date has been picked: ", date);
+      this.setState({isDatePickerVisible: false});
+    }
+
     render() {
         return (
             <View>
@@ -87,7 +92,7 @@ class MainStats extends Component {
                     <DateTimePickerModal
                         isVisible={this.state.isDatePickerVisible}
                         mode="date"
-                        onConfirm={() => this.setState({ isDatePickerVisible: false })}
+                        onConfirm={this.dateConfirmHandler}
                         onCancel={() => this.setState({ isDatePickerVisible: false })}
                     />
                 </View>
