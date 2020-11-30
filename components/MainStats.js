@@ -20,7 +20,7 @@ class MainStats extends Component {
   loadData() {
     console.log("loadData()");
     axios
-      .get("http://localhost:5000/data/", { withCredentials: true })
+      .get("https://mainstats.herokuapp.com/data", { withCredentials: true })
       .then((response) => {
         //console.log(response.data);
         this.setState({ savedData: response.data });
