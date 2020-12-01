@@ -14,9 +14,19 @@ class MainStats extends Component {
             sex: 3,
             ageGroup: 4,
             classification: 5,
-            isDatePickerVisible: false
+            isDatePickerVisible: false,
+            totalCases: 1,
+            recovered: 1,
+            deaths: 0
         };
     }
+
+    // pass in the number of cases
+    totalCases(dataSize) {
+        this.setState({totalCases: dataSize});
+    }
+
+    recoverd
 
     loadData() {
         console.log("loadData()");
