@@ -17,16 +17,31 @@ class MainStats extends Component {
             isDatePickerVisible: false,
             totalCases: 1,
             recovered: 1,
-            deaths: 0
+            deaths: 0,
+            maleCases: 0,
+            femaleCases: 0
         };
     }
 
     // pass in the number of cases
-    totalCases(dataSize) {
-        this.setState({totalCases: dataSize});
+    totalCases(data) {
+        this.setState({totalCases: data.length});
     }
 
-    recoverd
+    casesByGender(data) {
+        var males = 0;
+        var females = 0;
+        for (let i = 0; i < data.length; i++){
+            data[i].Sex == 'M' ? males++ : females++;
+        }
+        this.setState({maleCases: males, femaleCases: females});
+        console.log("Male cases in casesByGender()" + males);
+        console.log(this.state.maleCases);
+    }
+
+    casesByRegion(data){
+        var fraser, vancouverCoastal, interior, northern, outOfCanada = 0;
+    }
 
     loadData() {
         console.log("loadData()");
@@ -39,6 +54,7 @@ class MainStats extends Component {
                 console.log(this.state.savedData);
                 this.searchInData();
                 this.filterData();
+                this.casesByGender(this.state.savedData);
             });
     }
 
@@ -91,11 +107,8 @@ class MainStats extends Component {
         return (
             <View>
                 <View>
-                    <Text>{this.state.reportedDate}</Text>
-                    <Text>{this.state.ha}</Text>
-                    <Text>{this.state.sex}</Text>
-                    <Text>{this.state.ageGroup}</Text>
-                    <Text>{this.state.classification}</Text>
+                    <Text>Male Cases: {this.state.maleCases}</Text>
+                    <Text>Female Cases: {this.state.femaleCases}</Text>
                 </View>
                 <View>
                     <Button title="Show Date Picker" onPress={() => this.setState({ isDatePickerVisible: true })} />
