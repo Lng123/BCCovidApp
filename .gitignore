@@ -14,3 +14,4 @@ web-build/
 
 backend/node_modules
 backend/.env
+debug.log

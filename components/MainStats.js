@@ -18,8 +18,8 @@ class MainStats extends Component {
             totalCases: 1,
             recovered: 1,
             deaths: 0,
-            maleCases: 0,
-            femaleCases: 0
+            genderCases: "",
+            region: "",
         };
     }
 
@@ -31,16 +31,31 @@ class MainStats extends Component {
     casesByGender(data) {
         var males = 0;
         var females = 0;
+        var genderCount = {};
         for (let i = 0; i < data.length; i++){
-            data[i].Sex == 'M' ? males++ : females++;
+            if(genderCount[data[i].Sex] == null){
+                genderCount[data[i].Sex] = 1;
+            } else {
+                genderCount[data[i].Sex]++;
+            }
         }
-        this.setState({maleCases: males, femaleCases: females});
-        console.log("Male cases in casesByGender()" + males);
-        console.log(this.state.maleCases);
+        this.setState({genderCases: JSON.stringify(genderCount)});
+        console.log(genderCount);
     }
 
     casesByRegion(data){
-        var fraser, vancouverCoastal, interior, northern, outOfCanada = 0;
+        //var fraser, vancouverCoastal, interior, northern, outOfCanada = 0;
+        let dict = {}
+        let haCount = {}
+        for (let i = 0; i < data.length; i++){
+            if(haCount[data[i].HA] == null){
+                haCount[data[i].HA] = 1;
+            } else {
+                haCount[data[i].HA]++;
+            }
+        }
+        this.setState({region: JSON.stringify(haCount)});
+        console.log(haCount)
     }
 
     loadData() {
@@ -55,6 +70,7 @@ class MainStats extends Component {
                 this.searchInData();
                 this.filterData();
                 this.casesByGender(this.state.savedData);
+                this.casesByRegion(this.state.savedData);
             });
     }
 
@@ -107,8 +123,8 @@ class MainStats extends Component {
         return (
             <View>
                 <View>
-                    <Text>Male Cases: {this.state.maleCases}</Text>
-                    <Text>Female Cases: {this.state.femaleCases}</Text>
+                    <Text>Cases By Gender: {this.state.genderCases}</Text>
+                    <Text>Region Cases: {this.state.region}</Text>
                 </View>
                 <View>
                     <Button title="Show Date Picker" onPress={() => this.setState({ isDatePickerVisible: true })} />
