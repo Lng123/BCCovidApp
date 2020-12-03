@@ -52,8 +52,6 @@ class MainStats extends Component {
     }
 
     newCases(data) {
-        // var casesToday = 0;
-        // var today = new Date().toLocaleDateString("en-CA");
         var casesByLastFiveDates = {};
         console.log(this.last5Days());
         for (let i = data.length - 1; i > 0; i--) {
