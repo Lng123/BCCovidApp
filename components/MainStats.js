@@ -20,41 +20,84 @@ class MainStats extends Component {
             deaths: 0,
             genderCases: "",
             region: "",
+            newCases: ""
         };
     }
 
     // pass in the number of cases
     totalCases(data) {
-        this.setState({totalCases: data.length});
+        this.setState({ totalCases: data.length });
+    }
+
+    // got dis baby from stack overflowwwwwwwwww thank you adeneo
+    formatDate(date) {
+        var dd = date.getDate();
+        var mm = date.getMonth() + 1;
+        var yyyy = date.getFullYear();
+        if (dd < 10) { dd = '0' + dd }
+        if (mm < 10) { mm = '0' + mm }
+        date = yyyy + '-' + mm + '-' + dd;
+        return date
+    }
+
+    // returns an array of the last five days
+    last5Days() {
+        var result = [];
+        for (var i = 0; i < 5; i++) {
+            var d = new Date();
+            d.setDate(d.getDate() - i);
+            result.push(this.formatDate(d));
+        }
+
+        return (result.join(','));
+    }
+
+    // function to get the cases per day for the last five days
+    newCases(data) {
+        var casesByLastFiveDates = {};
+        // console.log(this.last5Days());
+        for (let i = data.length - 1; i > 0; i--) {
+            if (this.last5Days().includes(data[i].Reported_Date)) {
+                if (casesByLastFiveDates[data[i].Reported_Date] == null) {
+                    casesByLastFiveDates[data[i].Reported_Date] = 1;
+                } else {
+                    casesByLastFiveDates[data[i].Reported_Date]++;
+                }
+            } else {
+                break;
+            }
+        }
+
+        this.setState({ newCases: JSON.stringify(casesByLastFiveDates) })
+        console.log("Cases in last five dates: " + casesByLastFiveDates);
     }
 
     casesByGender(data) {
         var males = 0;
         var females = 0;
         var genderCount = {};
-        for (let i = 0; i < data.length; i++){
-            if(genderCount[data[i].Sex] == null){
+        for (let i = 0; i < data.length; i++) {
+            if (genderCount[data[i].Sex] == null) {
                 genderCount[data[i].Sex] = 1;
             } else {
                 genderCount[data[i].Sex]++;
             }
         }
-        this.setState({genderCases: JSON.stringify(genderCount)});
+        this.setState({ genderCases: JSON.stringify(genderCount) });
         console.log(genderCount);
     }
 
-    casesByRegion(data){
+    casesByRegion(data) {
         //var fraser, vancouverCoastal, interior, northern, outOfCanada = 0;
-        let dict = {}
         let haCount = {}
-        for (let i = 0; i < data.length; i++){
-            if(haCount[data[i].HA] == null){
+        for (let i = 0; i < data.length; i++) {
+            if (haCount[data[i].HA] == null) {
                 haCount[data[i].HA] = 1;
             } else {
                 haCount[data[i].HA]++;
             }
         }
-        this.setState({region: JSON.stringify(haCount)});
+        this.setState({ region: JSON.stringify(haCount) });
         console.log(haCount)
     }
 
@@ -71,6 +114,7 @@ class MainStats extends Component {
                 this.filterData();
                 this.casesByGender(this.state.savedData);
                 this.casesByRegion(this.state.savedData);
+                this.newCases(this.state.savedData);
             });
     }
 
@@ -115,8 +159,8 @@ class MainStats extends Component {
     }
 
     dateConfirmHandler = (date) => {
-      console.warn("A date has been picked: ", date);
-      this.setState({isDatePickerVisible: false});
+        console.warn("A date has been picked: ", date);
+        this.setState({ isDatePickerVisible: false });
     }
 
     render() {
@@ -125,6 +169,7 @@ class MainStats extends Component {
                 <View>
                     <Text>Cases By Gender: {this.state.genderCases}</Text>
                     <Text>Region Cases: {this.state.region}</Text>
+                    <Text>New Cases (Today): {this.state.newCases}</Text>
                 </View>
                 <View>
                     <Button title="Show Date Picker" onPress={() => this.setState({ isDatePickerVisible: true })} />
