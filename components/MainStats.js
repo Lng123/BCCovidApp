@@ -29,8 +29,8 @@ class MainStats extends Component {
         this.setState({ totalCases: data.length });
     }
 
+    // got dis baby from stack overflowwwwwwwwww thank you adeneo
     formatDate(date) {
-
         var dd = date.getDate();
         var mm = date.getMonth() + 1;
         var yyyy = date.getFullYear();
@@ -40,6 +40,7 @@ class MainStats extends Component {
         return date
     }
 
+    // returns an array of the last five days
     last5Days() {
         var result = [];
         for (var i = 0; i < 5; i++) {
@@ -51,9 +52,10 @@ class MainStats extends Component {
         return (result.join(','));
     }
 
+    // function to get the cases per day for the last five days
     newCases(data) {
         var casesByLastFiveDates = {};
-        console.log(this.last5Days());
+        // console.log(this.last5Days());
         for (let i = data.length - 1; i > 0; i--) {
             if (this.last5Days().includes(data[i].Reported_Date)) {
                 if (casesByLastFiveDates[data[i].Reported_Date] == null) {
@@ -87,7 +89,6 @@ class MainStats extends Component {
 
     casesByRegion(data) {
         //var fraser, vancouverCoastal, interior, northern, outOfCanada = 0;
-        let dict = {}
         let haCount = {}
         for (let i = 0; i < data.length; i++) {
             if (haCount[data[i].HA] == null) {
