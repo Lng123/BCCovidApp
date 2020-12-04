@@ -216,12 +216,12 @@ class MainStats extends Component {
                     yAxisSuffix=""
                     yAxisInterval={1} // optional, defaults to 1
                     chartConfig={{
-                        backgroundColor: "#e26a00",
-                        backgroundGradientFrom: "#fb8c00",
-                        backgroundGradientTo: "#ffa726",
+                        backgroundColor: "#eeeeee",
+                        backgroundGradientFrom: "#eeeeee",
+                        backgroundGradientTo: "#eeeeee",
                         decimalPlaces: 0, // optional, defaults to 2dp
-                        color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-                        labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+                        color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                        labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
                         style: {
                             borderRadius: 16
                         },
@@ -231,7 +231,6 @@ class MainStats extends Component {
                             stroke: "#ffa726"
                         }
                     }}
-                    bezier
                     style={{
                         marginVertical: 8,
                         borderRadius: 16
