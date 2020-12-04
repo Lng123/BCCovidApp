@@ -1,6 +1,6 @@
 import { StatusBar } from "expo-status-bar";
 import React, { Component } from "react";
-import { StyleSheet, Text, View, Button, TouchableWithoutFeedbackBase } from "react-native";
+import { Dimensions, StyleSheet, Text, View, Button, TouchableWithoutFeedbackBase } from "react-native";
 import axios from "axios";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import {
@@ -49,10 +49,10 @@ class MainStats extends Component {
         return date
     }
 
-    // returns an array of the last five days
+    // returns an array of the last seven days, from yesterday to one week ago.
     last7Days() {
         var result = [];
-        for (var i = 0; i < 7; i++) {
+        for (var i = 1; i < 8; i++) {
             var d = new Date();
             d.setDate(d.getDate() - i);
             result.push(this.formatDate(d));
@@ -61,11 +61,15 @@ class MainStats extends Component {
         return (result.join(','));
     }
 
-    // function to get the cases per day for the last five days
+    // function to get the cases per day for the last seven days
     newCases(data) {
         var casesByLastSevenDates = {};
+        var today = new Date().toLocaleDateString("en-CA").split("/")
         // console.log(this.last5Days());
         for (let i = data.length - 1; i > 0; i--) {
+            if(data[i].Reported_Date == today){
+                continue;
+            }
             if (this.last7Days().includes(data[i].Reported_Date)) {
                 if (casesByLastSevenDates[data[i].Reported_Date] == null) {
                     casesByLastSevenDates[data[i].Reported_Date] = 1;
@@ -180,7 +184,7 @@ class MainStats extends Component {
                 <View>
                     <Text>Cases By Gender: {this.state.genderCases}</Text>
                     <Text>Region Cases: {this.state.region}</Text>
-                    <Text>New Cases (Today): {this.state.newCases}</Text>
+                    <Text>New Cases (Last seven days): {this.state.newCases}</Text>
                     <Text>New Cases (Seven): {this.state.lastSevenDays.toString()}</Text>
                 </View>
                 <View>
@@ -196,10 +200,11 @@ class MainStats extends Component {
                
                 <LineChart
                     data={{
-                        labels: ["5 days ago", "4 days ago", "3 days ago", "2 days ago", "1 days ago", "Today"],
+                        labels: ["One week ago", "6 days ago", "5 days ago", "4 days ago", "3 days ago", "2 days ago", "Yesterday"],
                         datasets: [
                             {
                                 data: [
+                                    this.state.lastSevenDays[6],
                                     this.state.lastSevenDays[5],
                                     this.state.lastSevenDays[4],
                                     this.state.lastSevenDays[3],
@@ -210,15 +215,16 @@ class MainStats extends Component {
                             }
                         ]
                     }}
-                    width={1000} // from react-native
-                    height={220}
+                    width={Dimensions.get("window").width * 0.8} // from react-native
+                    height={400}
                     yAxisLabel=""
                     yAxisSuffix=""
-                    yAxisInterval={1} // optional, defaults to 1
+                    yAxisInterval={10} // optional, defaults to 1
+                    fromZero={true}
                     chartConfig={{
-                        backgroundColor: "#eeeeee",
-                        backgroundGradientFrom: "#eeeeee",
-                        backgroundGradientTo: "#eeeeee",
+                        backgroundColor: "#FFFFFF",
+                        backgroundGradientFrom: "#FFFFFF",
+                        backgroundGradientTo: "#FFFFFF",
                         decimalPlaces: 0, // optional, defaults to 2dp
                         color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
                         labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
@@ -226,13 +232,13 @@ class MainStats extends Component {
                             borderRadius: 16
                         },
                         propsForDots: {
-                            r: "6",
+                            r: "5",
                             strokeWidth: "2",
                             stroke: "#ffa726"
                         }
                     }}
                     style={{
-                        marginVertical: 8,
+                        marginVertical: 2,
                         borderRadius: 16
                     }}
                 />
