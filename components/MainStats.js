@@ -29,7 +29,7 @@ class MainStats extends Component {
             genderCases: "",
             region: "",
             newCases: "",
-            lastSevenDays:[]
+            lastSevenDays:[0,0,0,0,0,0,0,0,0]
         };
     }
 
