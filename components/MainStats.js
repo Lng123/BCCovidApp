@@ -3,6 +3,14 @@ import React, { Component } from "react";
 import { StyleSheet, Text, View, Button, TouchableWithoutFeedbackBase } from "react-native";
 import axios from "axios";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import {
+    LineChart,
+    BarChart,
+    PieChart,
+    ProgressChart,
+    ContributionGraph,
+    StackedBarChart
+} from "react-native-chart-kit";
 
 class MainStats extends Component {
     constructor(props) {
@@ -20,7 +28,8 @@ class MainStats extends Component {
             deaths: 0,
             genderCases: "",
             region: "",
-            newCases: ""
+            newCases: "",
+            lastSevenDays:[]
         };
     }
 
@@ -41,9 +50,9 @@ class MainStats extends Component {
     }
 
     // returns an array of the last five days
-    last5Days() {
+    last7Days() {
         var result = [];
-        for (var i = 0; i < 5; i++) {
+        for (var i = 0; i < 7; i++) {
             var d = new Date();
             d.setDate(d.getDate() - i);
             result.push(this.formatDate(d));
@@ -54,22 +63,24 @@ class MainStats extends Component {
 
     // function to get the cases per day for the last five days
     newCases(data) {
-        var casesByLastFiveDates = {};
+        var casesByLastSevenDates = {};
         // console.log(this.last5Days());
         for (let i = data.length - 1; i > 0; i--) {
-            if (this.last5Days().includes(data[i].Reported_Date)) {
-                if (casesByLastFiveDates[data[i].Reported_Date] == null) {
-                    casesByLastFiveDates[data[i].Reported_Date] = 1;
+            if (this.last7Days().includes(data[i].Reported_Date)) {
+                if (casesByLastSevenDates[data[i].Reported_Date] == null) {
+                    casesByLastSevenDates[data[i].Reported_Date] = 1;
                 } else {
-                    casesByLastFiveDates[data[i].Reported_Date]++;
+                    casesByLastSevenDates[data[i].Reported_Date]++;
                 }
             } else {
                 break;
             }
         }
-
-        this.setState({ newCases: JSON.stringify(casesByLastFiveDates) })
-        console.log("Cases in last five dates: " + casesByLastFiveDates);
+        var array = Object.values(casesByLastSevenDates);
+        this.setState({lastSevenDays : array});
+        console.log(array);
+        this.setState({ newCases: JSON.stringify(casesByLastSevenDates) });
+        //console.log("Cases in last seven dates: " + casesByLastSevenDates);
     }
 
     casesByGender(data) {
@@ -108,8 +119,8 @@ class MainStats extends Component {
             .then((response) => {
                 //console.log(response.data);
                 this.setState({ savedData: response.data });
-                console.log("setState");
-                console.log(this.state.savedData);
+                //console.log("setState");
+                //console.log(this.state.savedData);
                 this.searchInData();
                 this.filterData();
                 this.casesByGender(this.state.savedData);
@@ -126,8 +137,8 @@ class MainStats extends Component {
       }*/
 
     searchInData() {
-        console.log("searchInData()");
-        console.log(this.state.savedData);
+        //console.log("searchInData()");
+        //console.log(this.state.savedData);
         this.setState({
             reportedDate: this.state.savedData[0].Reported_Date,
             ha: this.state.savedData[0].HA,
@@ -152,10 +163,10 @@ class MainStats extends Component {
                 end = i;
             }
         }
-
+/*
         for (let k = start; k < end; k++) {
             console.log(this.state.savedData[k].Reported_Date);
-        }
+        }*/
     }
 
     dateConfirmHandler = (date) => {
@@ -170,6 +181,7 @@ class MainStats extends Component {
                     <Text>Cases By Gender: {this.state.genderCases}</Text>
                     <Text>Region Cases: {this.state.region}</Text>
                     <Text>New Cases (Today): {this.state.newCases}</Text>
+                    <Text>New Cases (Seven): {this.state.lastSevenDays.toString()}</Text>
                 </View>
                 <View>
                     <Button title="Show Date Picker" onPress={() => this.setState({ isDatePickerVisible: true })} />
@@ -180,7 +192,53 @@ class MainStats extends Component {
                         onCancel={() => this.setState({ isDatePickerVisible: false })}
                     />
                 </View>
+                <View>
+               
+                <LineChart
+                    data={{
+                        labels: ["5 days ago", "4 days ago", "3 days ago", "2 days ago", "1 days ago", "Today"],
+                        datasets: [
+                            {
+                                data: [
+                                    this.state.lastSevenDays[5],
+                                    this.state.lastSevenDays[4],
+                                    this.state.lastSevenDays[3],
+                                    this.state.lastSevenDays[2],
+                                    this.state.lastSevenDays[1],
+                                    this.state.lastSevenDays[0]
+                                ]
+                            }
+                        ]
+                    }}
+                    width={1000} // from react-native
+                    height={220}
+                    yAxisLabel=""
+                    yAxisSuffix=""
+                    yAxisInterval={1} // optional, defaults to 1
+                    chartConfig={{
+                        backgroundColor: "#e26a00",
+                        backgroundGradientFrom: "#fb8c00",
+                        backgroundGradientTo: "#ffa726",
+                        decimalPlaces: 0, // optional, defaults to 2dp
+                        color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+                        labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+                        style: {
+                            borderRadius: 16
+                        },
+                        propsForDots: {
+                            r: "6",
+                            strokeWidth: "2",
+                            stroke: "#ffa726"
+                        }
+                    }}
+                    bezier
+                    style={{
+                        marginVertical: 8,
+                        borderRadius: 16
+                    }}
+                />
             </View>
+            </View >
         );
     }
 }
