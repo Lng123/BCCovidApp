@@ -1,5 +1,5 @@
 import { StatusBar } from "expo-status-bar";
-import React, { Component } from "react";
+import React, { Component,useState } from "react";
 import { Dimensions, StyleSheet, Text, View, Button, TouchableWithoutFeedbackBase } from "react-native";
 import axios from "axios";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
@@ -11,11 +11,14 @@ import {
     ContributionGraph,
     StackedBarChart
 } from "react-native-chart-kit";
+import { Asset } from 'expo-asset';
+import { AppLoading } from 'expo';
 
 class MainStats extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            isReady: false,
             savedData: {},
             reportedDate: 1,
             ha: 2,
@@ -86,12 +89,12 @@ class MainStats extends Component {
         for(let i = 0;i<labels.length;i++){
             let d = labels[i].split('-')[2];
             labels[i] = d;
-            console.log(d)
+            //console.log(d)
         }
         labels = labels.reverse();
         this.setState({lastSevenDaysLabels: labels})
         this.setState({lastSevenDays : array});
-        console.log(array);
+        //console.log(array);
         this.setState({ newCases: JSON.stringify(casesByLastSevenDates) });
         //console.log("Cases in last seven dates: " + casesByLastSevenDates);
     }
@@ -108,7 +111,7 @@ class MainStats extends Component {
             }
         }
         this.setState({ genderCases: JSON.stringify(genderCount) });
-        console.log(genderCount);
+        //console.log(genderCount);
     }
 
     casesByRegion(data) {
@@ -122,7 +125,7 @@ class MainStats extends Component {
             }
         }
         this.setState({ region: JSON.stringify(haCount) });
-        console.log(haCount)
+        //console.log(haCount)
     }
 
     loadData() {
@@ -131,6 +134,7 @@ class MainStats extends Component {
             .get("https://mainstats.herokuapp.com/data", { withCredentials: true })
             .then((response) => {
                 //console.log(response.data);
+                console.log("Response received");
                 this.setState({ savedData: response.data });
                 //console.log("setState");
                 //console.log(this.state.savedData);
@@ -139,11 +143,14 @@ class MainStats extends Component {
                 this.casesByGender(this.state.savedData);
                 this.casesByRegion(this.state.savedData);
                 this.newCases(this.state.savedData);
+                this.setState({ isReady : true })
             });
+        
     }
 
     componentDidMount() {
-        this.loadData();
+        console.log(this.state.isReady)
+        //this.loadData();
     }
     /*componentDidUpdate(){
         this.filterData();
@@ -188,6 +195,15 @@ class MainStats extends Component {
     }
 
     render() {
+        console.log(this.state.isReady)
+        if (!this.state.isReady) {
+            return (
+              <AppLoading
+                startAsync={this.loadData()}
+                onFinish={() => this.setState({ isReady: true })}
+                onError={console.warn}
+              />
+            ); }   
         return (
             <View>
                 <View>
@@ -255,6 +271,7 @@ class MainStats extends Component {
             </View >
         );
     }
+
 }
 
 export default MainStats;
