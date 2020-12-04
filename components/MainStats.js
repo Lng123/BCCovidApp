@@ -29,7 +29,8 @@ class MainStats extends Component {
             genderCases: "",
             region: "",
             newCases: "",
-            lastSevenDays:[]
+            lastSevenDays:[0,0,0,0,0,0,0,0,0],
+            lastSevenDaysLabels:[" "," "]
         };
     }
 
@@ -81,6 +82,14 @@ class MainStats extends Component {
             }
         }
         var array = Object.values(casesByLastSevenDates);
+        var labels = Object.keys(casesByLastSevenDates);
+        for(let i = 0;i<labels.length;i++){
+            let d = labels[i].split('-')[2];
+            labels[i] = d;
+            console.log(d)
+        }
+        labels = labels.reverse();
+        this.setState({lastSevenDaysLabels: labels})
         this.setState({lastSevenDays : array});
         console.log(array);
         this.setState({ newCases: JSON.stringify(casesByLastSevenDates) });
@@ -125,7 +134,7 @@ class MainStats extends Component {
                 this.setState({ savedData: response.data });
                 //console.log("setState");
                 //console.log(this.state.savedData);
-                this.searchInData();
+                //this.searchInData();
                 this.filterData();
                 this.casesByGender(this.state.savedData);
                 this.casesByRegion(this.state.savedData);
@@ -200,7 +209,7 @@ class MainStats extends Component {
                
                 <LineChart
                     data={{
-                        labels: ["One week ago", "6 days ago", "5 days ago", "4 days ago", "3 days ago", "2 days ago", "Yesterday"],
+                        labels: this.state.lastSevenDaysLabels,
                         datasets: [
                             {
                                 data: [
@@ -232,13 +241,13 @@ class MainStats extends Component {
                             borderRadius: 16
                         },
                         propsForDots: {
-                            r: "5",
+                            r: "6",
                             strokeWidth: "2",
                             stroke: "#ffa726"
                         }
                     }}
                     style={{
-                        marginVertical: 2,
+                        marginVertical: 8,
                         borderRadius: 16
                     }}
                 />
