@@ -144,12 +144,14 @@ class MainStats extends Component {
                 this.casesByRegion(this.state.savedData);
                 this.newCases(this.state.savedData);
                 this.setState({ isReady : true })
+                
             });
+        
         
     }
 
     componentDidMount() {
-        console.log(this.state.isReady)
+        //console.log(this.state.isReady)
         //this.loadData();
     }
     /*componentDidUpdate(){
@@ -195,14 +197,19 @@ class MainStats extends Component {
     }
 
     render() {
-        console.log(this.state.isReady)
+        //console.log(this.state.isReady)
         if (!this.state.isReady) {
             return (
+            <View>
               <AppLoading
                 startAsync={this.loadData()}
                 onFinish={() => this.setState({ isReady: true })}
                 onError={console.warn}
               />
+              <View>
+                <Text>Data is loading in, please wait</Text>
+              </View>
+              </View>
             ); }   
         return (
             <View>
