@@ -131,6 +131,14 @@ class MainStats extends Component {
     loadData() {
         console.log("loadData()");
         axios
+        .get("https://mainstats.herokuapp.com/lastsevendays", { withCredentials: true })
+        .then((response) => {
+            this.setState({ savedData: response.data });
+            this.newCases(this.state.savedData);
+            this.setState({ isReady : true })
+            
+        });
+        axios
             .get("https://mainstats.herokuapp.com/data", { withCredentials: true })
             .then((response) => {
                 //console.log(response.data);
