@@ -131,6 +131,12 @@ class MainStats extends Component {
     loadData() {
         console.log("loadData()");
         axios
+        .get("https://mainstats.herokuapp.com/gender", { withCredentials: true })
+        .then((response) => {
+            this.setState({genderCases:JSON.stringify(response.data)})
+            
+        });
+        axios
         .get("https://mainstats.herokuapp.com/lastsevendays", { withCredentials: true })
         .then((response) => {
             this.setState({ savedData: response.data });
@@ -148,8 +154,8 @@ class MainStats extends Component {
                 //console.log(this.state.savedData);
                 //this.searchInData();
                 this.filterData();
-                this.casesByGender(this.state.savedData);
-                this.casesByRegion(this.state.savedData);
+                //this.casesByGender(this.state.savedData);
+                //this.casesByRegion(this.state.savedData);
                 this.newCases(this.state.savedData);
                 this.setState({ isReady : true })
                 
