@@ -150,22 +150,22 @@ class MainStats extends Component {
             this.setState({ isReady : true })
             
         });
-        axios
-            .get("https://mainstats.herokuapp.com/data", { withCredentials: true })
-            .then((response) => {
-                //console.log(response.data);
-                console.log("Response received");
-                this.setState({ savedData: response.data });
-                //console.log("setState");
-                //console.log(this.state.savedData);
-                //this.searchInData();
-                this.filterData();
-                //this.casesByGender(this.state.savedData);
-                //this.casesByRegion(this.state.savedData);
-                this.newCases(this.state.savedData);
-                this.setState({ isReady : true })
+        // axios
+        //     .get("https://mainstats.herokuapp.com/data", { withCredentials: true })
+        //     .then((response) => {
+        //         //console.log(response.data);
+        //         console.log("Response received");
+        //         this.setState({ savedData: response.data });
+        //         //console.log("setState");
+        //         //console.log(this.state.savedData);
+        //         //this.searchInData();
+        //         this.filterData();
+        //         //this.casesByGender(this.state.savedData);
+        //         //this.casesByRegion(this.state.savedData);
+        //         this.newCases(this.state.savedData);
+        //         this.setState({ isReady : true })
                 
-            });
+        //     });
         
         
     }
