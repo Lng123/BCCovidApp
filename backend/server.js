@@ -22,8 +22,10 @@ connection.once("open", () => {
 });
 
 const dataRouter = require("./routes/data");
+const lastsevendaysRouter = require("./routes/lastsevendays");
 
 app.use("/data", dataRouter);
+app.use("/lastsevendays", lastsevendaysRouter);
 
 app.listen(port, () => {
   console.log(`Server is running on port: ${port}`);

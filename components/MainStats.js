@@ -235,15 +235,7 @@ class MainStats extends Component {
                         labels: this.state.lastSevenDaysLabels,
                         datasets: [
                             {
-                                data: [
-                                    this.state.lastSevenDays[6],
-                                    this.state.lastSevenDays[5],
-                                    this.state.lastSevenDays[4],
-                                    this.state.lastSevenDays[3],
-                                    this.state.lastSevenDays[2],
-                                    this.state.lastSevenDays[1],
-                                    this.state.lastSevenDays[0]
-                                ]
+                                data: this.state.lastSevenDays
                             }
                         ]
                     }}
