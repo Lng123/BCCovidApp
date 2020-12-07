@@ -137,6 +137,12 @@ class MainStats extends Component {
             
         });
         axios
+        .get("https://mainstats.herokuapp.com/regions", { withCredentials: true })
+        .then((response) => {
+            this.setState({region:JSON.stringify(response.data)})
+            
+        });
+        axios
         .get("https://mainstats.herokuapp.com/lastsevendays", { withCredentials: true })
         .then((response) => {
             this.setState({ savedData: response.data });
