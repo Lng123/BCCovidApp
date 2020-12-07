@@ -243,7 +243,7 @@ class MainStats extends Component {
                         labels: this.state.lastSevenDaysLabels,
                         datasets: [
                             {
-                                data: this.state.lastSevenDays
+                                data: this.state.lastSevenDays.reverse()
                             }
                         ]
                     }}
