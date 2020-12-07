@@ -24,10 +24,12 @@ connection.once("open", () => {
 const dataRouter = require("./routes/data");
 const lastsevendaysRouter = require("./routes/lastsevendays");
 const gendercountRouter = require("./routes/gendercount");
+const regionRouter = require("./routes/regions");
 
 app.use("/data", dataRouter);
 app.use("/lastsevendays", lastsevendaysRouter);
 app.use("/gender", gendercountRouter);
+app.use("/regions", regionRouter);
 
 app.listen(port, () => {
   console.log(`Server is running on port: ${port}`);
