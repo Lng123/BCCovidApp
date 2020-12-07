@@ -93,7 +93,7 @@ class MainStats extends Component {
         }
         labels = labels.reverse();
         this.setState({lastSevenDaysLabels: labels})
-        this.setState({lastSevenDays : array});
+        this.setState({lastSevenDays : array.reverse()});
         //console.log(array);
         this.setState({ newCases: JSON.stringify(casesByLastSevenDates) });
         //console.log("Cases in last seven dates: " + casesByLastSevenDates);
@@ -243,7 +243,7 @@ class MainStats extends Component {
                         labels: this.state.lastSevenDaysLabels,
                         datasets: [
                             {
-                                data: this.state.lastSevenDays.reverse()
+                                data: this.state.lastSevenDays
                             }
                         ]
                     }}
