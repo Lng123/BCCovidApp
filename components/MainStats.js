@@ -53,7 +53,7 @@ class MainStats extends Component {
         return date
     }
 
-    // returns an array of the last seven days, from yesterday to one week ago.
+    // returns an cases of the last seven days, from yesterday to one week ago.
     last7Days() {
         var result = [];
         for (var i = 1; i < 8; i++) {
@@ -68,6 +68,7 @@ class MainStats extends Component {
     // function to get the cases per day for the last seven days
     newCases(data) {
         var casesByLastSevenDates = {};
+        var lastSevenDaysStr = "";
         var today = new Date().toLocaleDateString("en-CA").split("/")
         // console.log(this.last5Days());
         for (let i = data.length - 1; i > 0; i--) {
@@ -84,19 +85,27 @@ class MainStats extends Component {
                 break;
             }
         }
-        var array = Object.values(casesByLastSevenDates);
-        var labels = Object.keys(casesByLastSevenDates);
-        for(let i = 0;i<labels.length;i++){
-            let d = labels[i].split('-')[2];
-            labels[i] = d;
+
+        var cases = Object.values(casesByLastSevenDates);
+        var dates = Object.keys(casesByLastSevenDates);
+
+        // Creates a string of the cases in the last seven days.
+        for (let i = 0; i < dates.length; i++){
+            lastSevenDaysStr += dates[i] + ": " + cases[i] + "\n";
+        }
+        this.setState ({newCases: lastSevenDaysStr});
+
+        var labelsForGraph = Object.keys(casesByLastSevenDates);
+        for(let i = 0;i<labelsForGraph.length;i++){
+            let d = labelsForGraph[i].split('-')[2];
+            labelsForGraph[i] = d;
             //console.log(d)
         }
-        labels = labels.reverse();
-        this.setState({lastSevenDaysLabels: labels})
-        this.setState({lastSevenDays : array.reverse()});
-        //console.log(array);
-        this.setState({ newCases: JSON.stringify(casesByLastSevenDates) });
-        //console.log("Cases in last seven dates: " + casesByLastSevenDates);
+        labelsForGraph = labelsForGraph.reverse();
+        this.setState({lastSevenDaysLabels: labelsForGraph})
+        this.setState({lastSevenDays : cases.reverse()});
+        
+        // this.setState({ newCases: JSON.stringify(casesByLastSevenDates) });
     }
 
     casesByGender(data) {
@@ -111,7 +120,6 @@ class MainStats extends Component {
             }
         }
         this.setState({ genderCases: JSON.stringify(genderCount) });
-        //console.log(genderCount);
     }
 
     casesByRegion(data) {
@@ -133,14 +141,22 @@ class MainStats extends Component {
         axios
         .get("https://mainstats.herokuapp.com/gender", { withCredentials: true })
         .then((response) => {
-            this.setState({genderCases:JSON.stringify(response.data)})
-            
+            var females = response.data[0].count;
+            var males = response.data[1].count;
+
+            // this.setState({genderCases:JSON.stringify(response.data)})
+            this.setState({genderCases: "Female Cases: " + females + "\nMale Cases: " + males })
         });
         axios
         .get("https://mainstats.herokuapp.com/regions", { withCredentials: true })
         .then((response) => {
-            this.setState({region:JSON.stringify(response.data)}) 
-            
+            var regionCasesStr = "";
+            for(let i = 0; i < response.data.length; i++)(
+                regionCasesStr += response.data[i]._id + ": " + response.data[i].count + "\n"
+            )
+
+            this.setState({region: regionCasesStr});
+            // this.setState({region:JSON.stringify(response.data)}) 
         });
         axios
         .get("https://mainstats.herokuapp.com/lastsevendays", { withCredentials: true })
@@ -234,10 +250,13 @@ class MainStats extends Component {
         return (
             <View>
                 <View>
-                    <Text>Cases By Gender: {this.state.genderCases}</Text>
-                    <Text>Region Cases: {this.state.region}</Text>
-                    <Text>New Cases (Last seven days): {this.state.newCases}</Text>
-                    <Text>New Cases (Seven): {this.state.lastSevenDays.toString()}</Text>
+                    <Text>CASES BY GENDER</Text>
+                    <Text>{this.state.genderCases}</Text>
+                    <Text>CASES BY REGION</Text>
+                    <Text>{this.state.region}</Text>
+                    <Text>NEW CASES IN THE LAST SEVEN DAYS:</Text>
+                    <Text>{this.state.newCases}</Text>
+                    {/* <Text>New Cases (Seven): {this.state.lastSevenDays.toString()}</Text> */}
                 </View>
                 <View>
                     <Button title="Show Date Picker" onPress={() => this.setState({ isDatePickerVisible: true })} />
