@@ -32,6 +32,8 @@ class MainStats extends Component {
             genderCases: "",
             region: "",
             newCases: "",
+            dailyCases: 0,
+            selectedDate: 0,
             lastSevenDays:[0,0,0,0,0,0,0,0,0],
             lastSevenDaysLabels:[" "," "]
         };
@@ -166,22 +168,6 @@ class MainStats extends Component {
             this.setState({ isReady : true })
             
         });
-        // axios
-        //     .get("https://mainstats.herokuapp.com/data", { withCredentials: true })
-        //     .then((response) => {
-        //         //console.log(response.data);
-        //         console.log("Response received");
-        //         this.setState({ savedData: response.data });
-        //         //console.log("setState");
-        //         //console.log(this.state.savedData);
-        //         //this.searchInData();
-        //         this.filterData();
-        //         //this.casesByGender(this.state.savedData);
-        //         //this.casesByRegion(this.state.savedData);
-        //         this.newCases(this.state.savedData);
-        //         this.setState({ isReady : true })
-                
-        //     });
         
         
     }
@@ -207,27 +193,66 @@ class MainStats extends Component {
     }
 
     filterData(startDate, endDate) {
-        let a = new Date(2020, 1, 10);
-        let b = new Date(2020, 2, 10);
         let start = 0;
         let end = 1;
         for (let i = 0; i < this.state.savedData.length; i++) {
             let compareDate = new Date(this.state.savedData[i].Reported_Date);
-            if (compareDate < a) {
+            if (compareDate < this.formatDate(startDate)) {
                 start = i + 1;
             }
 
-            if (compareDate < b) {
+            if (compareDate < this.formatDate(endDate)) {
                 end = i;
             }
         }
-/*
-        for (let k = start; k < end; k++) {
-            console.log(this.state.savedData[k].Reported_Date);
-        }*/
+        console.log(this.state.savedData.slice(start,end))
+        return this.state.savedData.slice(start,end)
+    }
+
+    
+    filterDataOnDay(UserDate) {
+        UserDate.setHours(0,0,0,0)
+        let EndUserDate = new Date(UserDate)
+        UserDate.setDate(UserDate.getDate() - 1)
+        let start = 0;
+        let end = 1;
+        for (let i = 0; i < this.state.savedData.length; i++) {
+            let compareDate = new Date(this.state.savedData[i].Reported_Date);
+            if (compareDate <= UserDate) {
+                start = i + 1;
+            }
+
+            if (compareDate < EndUserDate) {
+                end = i;
+            }
+        }/*
+        for (let i = start;i<=end;i++){
+            splitArray.push(this.state.savedData[i])
+        }
+
+        //console.log(UserDate,EndUserDate)
+        //console.log(start,end)
+        //console.log(this.state.savedData[start])
+        //console.log(this.state.savedData[end])
+        connsole.log(splitArray[0], splitArray[splitArray.length - 1])*/
+
+        //+1 since slice doesn't take last index
+        return this.state.savedData.slice(start,end+1)
     }
 
     dateConfirmHandler = (date) => {
+        //time in milliseconds
+        var timezoneAdjustment = 28800000;
+        date.setTime(date.getTime()-timezoneAdjustment)
+         axios
+             .get("https://mainstats.herokuapp.com/data", { withCredentials: true })
+             .then((response) => {
+                 this.setState({ savedData: response.data });
+                 this.setState({selectedDate: date.toString()})
+                 var filteredDates = this.filterDataOnDay(date)
+                 this.setState({dailyCases: filteredDates.length});
+                 
+             })
         console.warn("A date has been picked: ", date);
         this.setState({ isDatePickerVisible: false });
     }
@@ -266,6 +291,8 @@ class MainStats extends Component {
                         onConfirm={this.dateConfirmHandler}
                         onCancel={() => this.setState({ isDatePickerVisible: false })}
                     />
+                    <Text>{this.state.dailyCases}</Text>
+                    <Text>{this.state.selectedDate}</Text>
                 </View>
                 <View>
                
@@ -279,7 +306,7 @@ class MainStats extends Component {
                         ]
                     }}
                     width={Dimensions.get("window").width * 0.8} // from react-native
-                    height={400}
+                    height={200}
                     yAxisLabel=""
                     yAxisSuffix=""
                     yAxisInterval={10} // optional, defaults to 1
