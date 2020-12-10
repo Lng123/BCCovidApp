@@ -18,7 +18,9 @@ class MainStats extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            isReady: false,
+            isReady1: false,
+            isReady2: false,
+            isReady3: false,
             savedData: {},
             reportedDate: 1,
             ha: 2,
@@ -71,8 +73,8 @@ class MainStats extends Component {
     newCases(data) {
         var casesByLastSevenDates = {};
         var lastSevenDaysStr = "";
-        var today = new Date().toLocaleDateString("en-CA").split("/")
-        // console.log(this.last5Days());
+        var today = new Date()
+        today = this.formatDate(today);
         for (let i = data.length - 1; i > 0; i--) {
             if(data[i].Reported_Date == today){
                 continue;
@@ -139,7 +141,7 @@ class MainStats extends Component {
     }
 
     loadData() {
-        console.log("loadData()");
+        //console.log("loadData()");
         axios
         .get("https://mainstats.herokuapp.com/gender", { withCredentials: true })
         .then((response) => {
@@ -148,6 +150,7 @@ class MainStats extends Component {
 
             // this.setState({genderCases:JSON.stringify(response.data)})
             this.setState({genderCases: "Female Cases: " + females + "\nMale Cases: " + males })
+            this.setState({ isReady3 : true })
         });
         axios
         .get("https://mainstats.herokuapp.com/regions", { withCredentials: true })
@@ -158,14 +161,15 @@ class MainStats extends Component {
             )
 
             this.setState({region: regionCasesStr});
+            this.setState({ isReady2 : true })
             // this.setState({region:JSON.stringify(response.data)}) 
         });
         axios
         .get("https://mainstats.herokuapp.com/lastsevendays", { withCredentials: true })
         .then((response) => {
-            this.setState({ savedData: response.data });
-            this.newCases(this.state.savedData);
-            this.setState({ isReady : true })
+            //this.setState({ savedData: response.data });
+            this.newCases(response.data);
+            this.setState({ isReady1 : true })
             
         });
         
@@ -259,7 +263,7 @@ class MainStats extends Component {
 
     render() {
         //console.log(this.state.isReady)
-        if (!this.state.isReady) {
+        if (!this.state.isReady1 || !this.state.isReady2 || !this.state.isReady3) {
             return (
             <View>
               <AppLoading
