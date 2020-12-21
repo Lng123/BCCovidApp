@@ -217,9 +217,11 @@ class MainStats extends Component {
 
     
     filterDataOnDay(UserDate) {
+        let StartDate = UserDate.toString();
+        StartDate = new Date(StartDate);
         UserDate.setHours(0,0,0,0)
         let EndUserDate = new Date(UserDate)
-        UserDate.setDate(UserDate.getDate() - 1)
+        StartDate.setDate(StartDate.getDate() - 1)
         let start = 0;
         let end = 1;
         for (let i = 0; i < this.state.fullData.length; i++) {
@@ -237,8 +239,8 @@ class MainStats extends Component {
 
     dateConfirmHandler = (date) => {
         //time in milliseconds
-        var timezoneAdjustment = 28800000;
-        date.setTime(date.getTime()-timezoneAdjustment)
+        //var timezoneAdjustment = 28800000;
+        //date.setTime(date.getTime()-timezoneAdjustment)
         if(this.state.fullData.length == 0){
          axios
              .get("https://mainstats.herokuapp.com/data", { withCredentials: true })
