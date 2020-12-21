@@ -22,11 +22,13 @@ connection.once("open", () => {
 });
 
 const dataRouter = require("./routes/data");
+const data2Router = require("./routes/data2");
 const lastsevendaysRouter = require("./routes/lastsevendays");
 const gendercountRouter = require("./routes/gendercount");
 const regionRouter = require("./routes/regions");
 
 app.use("/data", dataRouter);
+app.use("/dataArchive", data2Router);
 app.use("/lastsevendays", lastsevendaysRouter);
 app.use("/gender", gendercountRouter);
 app.use("/regions", regionRouter);
