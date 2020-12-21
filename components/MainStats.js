@@ -1,5 +1,5 @@
 import { StatusBar } from "expo-status-bar";
-import React, { Component,useState } from "react";
+import React, { Component, useState } from "react";
 import { Dimensions, StyleSheet, Text, View, Button, TouchableWithoutFeedbackBase } from "react-native";
 import axios from "axios";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
@@ -36,9 +36,9 @@ class MainStats extends Component {
             newCases: "",
             dailyCases: 0,
             selectedDate: 0,
-            lastSevenDays:[0,0,0,0,0,0,0,0,0],
-            lastSevenDaysLabels:[" "," "],
-            fullData:[],
+            lastSevenDays: [0, 0, 0, 0, 0, 0, 0, 0, 0],
+            lastSevenDaysLabels: [" ", " "],
+            fullData: [],
         };
     }
 
@@ -77,7 +77,7 @@ class MainStats extends Component {
         var today = new Date()
         today = this.formatDate(today);
         for (let i = data.length - 1; i > 0; i--) {
-            if(data[i].Reported_Date == today){
+            if (data[i].Reported_Date == today) {
                 continue;
             }
             if (this.last7Days().includes(data[i].Reported_Date)) {
@@ -95,21 +95,21 @@ class MainStats extends Component {
         var dates = Object.keys(casesByLastSevenDates);
 
         // Creates a string of the cases in the last seven days.
-        for (let i = 0; i < dates.length; i++){
+        for (let i = 0; i < dates.length; i++) {
             lastSevenDaysStr += dates[i] + ": " + cases[i] + "\n";
         }
-        this.setState ({newCases: lastSevenDaysStr});
+        this.setState({ newCases: lastSevenDaysStr });
 
         var labelsForGraph = Object.keys(casesByLastSevenDates);
-        for(let i = 0;i<labelsForGraph.length;i++){
+        for (let i = 0; i < labelsForGraph.length; i++) {
             let d = labelsForGraph[i].split('-')[2];
             labelsForGraph[i] = d;
             //console.log(d)
         }
         labelsForGraph = labelsForGraph.reverse();
-        this.setState({lastSevenDaysLabels: labelsForGraph})
-        this.setState({lastSevenDays : cases.reverse()});
-        
+        this.setState({ lastSevenDaysLabels: labelsForGraph })
+        this.setState({ lastSevenDays: cases.reverse() });
+
         // this.setState({ newCases: JSON.stringify(casesByLastSevenDates) });
     }
 
@@ -145,37 +145,37 @@ class MainStats extends Component {
     loadData() {
         //console.log("loadData()");
         axios
-        .get("https://mainstats.herokuapp.com/gender", { withCredentials: true })
-        .then((response) => {
-            var females = response.data[0].count;
-            var males = response.data[1].count;
+            .get("https://mainstats.herokuapp.com/gender", { withCredentials: true })
+            .then((response) => {
+                var females = response.data[1].count;
+                var males = response.data[2].count;
 
-            // this.setState({genderCases:JSON.stringify(response.data)})
-            this.setState({genderCases: "Female Cases: " + females + "\nMale Cases: " + males })
-            this.setState({ isReady3 : true })
-        });
+                // this.setState({genderCases:JSON.stringify(response.data)})
+                this.setState({ genderCases: "Female Cases: " + females + "\nMale Cases: " + males })
+                this.setState({ isReady3: true })
+            });
         axios
-        .get("https://mainstats.herokuapp.com/regions", { withCredentials: true })
-        .then((response) => {
-            var regionCasesStr = "";
-            for(let i = 0; i < response.data.length; i++)(
-                regionCasesStr += response.data[i]._id + ": " + response.data[i].count + "\n"
-            )
+            .get("https://mainstats.herokuapp.com/regions", { withCredentials: true })
+            .then((response) => {
+                var regionCasesStr = "";
+                for (let i = 0; i < response.data.length; i++)(
+                    regionCasesStr += response.data[i]._id + ": " + response.data[i].count + "\n"
+                )
 
-            this.setState({region: regionCasesStr});
-            this.setState({ isReady2 : true })
-            // this.setState({region:JSON.stringify(response.data)}) 
-        });
+                this.setState({ region: regionCasesStr });
+                this.setState({ isReady2: true })
+                // this.setState({region:JSON.stringify(response.data)}) 
+            });
         axios
-        .get("https://mainstats.herokuapp.com/lastsevendays", { withCredentials: true })
-        .then((response) => {
-            //this.setState({ savedData: response.data });
-            this.newCases(response.data);
-            this.setState({ isReady1 : true })
-            
-        });
-        
-        
+            .get("https://mainstats.herokuapp.com/lastsevendays", { withCredentials: true })
+            .then((response) => {
+                //this.setState({ savedData: response.data });
+                this.newCases(response.data);
+                this.setState({ isReady1: true })
+
+            });
+
+
     }
 
     componentDidMount() {
@@ -211,20 +211,22 @@ class MainStats extends Component {
                 end = i;
             }
         }
-        console.log(this.state.fullData.slice(start,end))
-        return this.state.fullData.slice(start,end)
+        console.log(this.state.fullData.slice(start, end))
+        return this.state.fullData.slice(start, end)
     }
 
-    
+
     filterDataOnDay(UserDate) {
-        UserDate.setHours(0,0,0,0)
-        let EndUserDate = new Date(UserDate)
-        UserDate.setDate(UserDate.getDate() - 1)
+        let date = UserDate.toString();
+        date = new Date(date);
+        date.setHours(0, 0, 0, 0);
+        let EndUserDate = new Date(date);
+        date.setDate(date.getDate() - 1);
         let start = 0;
         let end = 1;
         for (let i = 0; i < this.state.fullData.length; i++) {
             let compareDate = new Date(this.state.fullData[i].Reported_Date);
-            if (compareDate <= UserDate) {
+            if (compareDate <= date) {
                 start = i + 1;
             }
 
@@ -232,29 +234,32 @@ class MainStats extends Component {
                 end = i;
             }
         }
-        return this.state.fullData.slice(start,end+1)
+        return this.state.fullData.slice(start, end + 1)
     }
 
     dateConfirmHandler = (date) => {
         //time in milliseconds
-        var timezoneAdjustment = 28800000;
-        date.setTime(date.getTime()-timezoneAdjustment)
-        if(this.state.fullData.length == 0){
-         axios
-             .get("https://mainstats.herokuapp.com/data", { withCredentials: true })
-             .then((response) => {
-                 this.setState({ savedData: response.data });
-                 this.setState({ fullData: response.data });
-                 var filteredDates = this.filterDataOnDay(date)
-                 this.setState({dailyCases: filteredDates.length});
-                 
-             }).catch(error => console.error('(1) Inside error:', error))
-            } else {
-                var filteredDates = this.filterDataOnDay(date)
-                this.setState({dailyCases: filteredDates.length});
+        var dateSelected = date;
+        // var timezoneAdjustment = 28800000;
+        // console.warn("Selected date: ", dateSelected);
+        // dateSelected.setTime(dateSelected.getTime() - timezoneAdjustment);
+        // console.warn("After adjustment: ", dateSelected);
+        if (this.state.fullData.length == 0) {
+            axios
+                .get("https://mainstats.herokuapp.com/data", { withCredentials: true })
+                .then((response) => {
+                    this.setState({ savedData: response.data });
+                    this.setState({ fullData: response.data });
+                    var filteredDates = this.filterDataOnDay(dateSelected)
+                    this.setState({ dailyCases: filteredDates.length });
+
+                }).catch(error => console.error('(1) Inside error:', error))
+        } else {
+            var filteredDates = this.filterDataOnDay(dateSelected)
+            this.setState({ dailyCases: filteredDates.length });
         }
-        this.setState({selectedDate: date.toString()})
-        console.warn("A date has been picked: ", date);     
+        this.setState({ selectedDate: dateSelected.toString() })
+        console.warn("A date has been picked: ", dateSelected);
         this.setState({ isDatePickerVisible: false });
     }
 
@@ -262,17 +267,18 @@ class MainStats extends Component {
         //console.log(this.state.isReady)
         if (!this.state.isReady1 || !this.state.isReady2 || !this.state.isReady3) {
             return (
-            <View>
-              <AppLoading
-                startAsync={this.loadData()}
-                onFinish={() => this.setState({ isReady: true })}
-                onError={console.warn}
-              />
-              <View>
-                <Text>Data is loading in, please wait</Text>
-              </View>
-              </View>
-            ); }   
+                <View>
+                    <AppLoading
+                        startAsync={this.loadData()}
+                        onFinish={() => this.setState({ isReady: true })}
+                        onError={console.warn}
+                    />
+                    <View>
+                        <Text>Data is loading in, please wait</Text>
+                    </View>
+                </View>
+            );
+        }
         return (
             <View>
                 <View>
@@ -296,44 +302,44 @@ class MainStats extends Component {
                     <Text>{this.state.selectedDate}</Text>
                 </View>
                 <View>
-               
-                <LineChart
-                    data={{
-                        labels: this.state.lastSevenDaysLabels,
-                        datasets: [
-                            {
-                                data: this.state.lastSevenDays
+
+                    <LineChart
+                        data={{
+                            labels: this.state.lastSevenDaysLabels,
+                            datasets: [
+                                {
+                                    data: this.state.lastSevenDays
+                                }
+                            ]
+                        }}
+                        width={Dimensions.get("window").width * 0.8} // from react-native
+                        height={200}
+                        yAxisLabel=""
+                        yAxisSuffix=""
+                        yAxisInterval={10} // optional, defaults to 1
+                        fromZero={true}
+                        chartConfig={{
+                            backgroundColor: "#FFFFFF",
+                            backgroundGradientFrom: "#FFFFFF",
+                            backgroundGradientTo: "#FFFFFF",
+                            decimalPlaces: 0, // optional, defaults to 2dp
+                            color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                            labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                            style: {
+                                borderRadius: 16
+                            },
+                            propsForDots: {
+                                r: "6",
+                                strokeWidth: "2",
+                                stroke: "#ffa726"
                             }
-                        ]
-                    }}
-                    width={Dimensions.get("window").width * 0.8} // from react-native
-                    height={200}
-                    yAxisLabel=""
-                    yAxisSuffix=""
-                    yAxisInterval={10} // optional, defaults to 1
-                    fromZero={true}
-                    chartConfig={{
-                        backgroundColor: "#FFFFFF",
-                        backgroundGradientFrom: "#FFFFFF",
-                        backgroundGradientTo: "#FFFFFF",
-                        decimalPlaces: 0, // optional, defaults to 2dp
-                        color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                        labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                        style: {
+                        }}
+                        style={{
+                            marginVertical: 8,
                             borderRadius: 16
-                        },
-                        propsForDots: {
-                            r: "6",
-                            strokeWidth: "2",
-                            stroke: "#ffa726"
-                        }
-                    }}
-                    style={{
-                        marginVertical: 8,
-                        borderRadius: 16
-                    }}
-                />
-            </View>
+                        }}
+                    />
+                </View>
             </View >
         );
     }
