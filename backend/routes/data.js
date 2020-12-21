@@ -3,7 +3,7 @@ const router = require("express").Router();
 let Data = require("../models/data.model");
 
 router.route("/").get(async (req, res) => {
-  var data = await Data.Data.find()
+  var data = await Data.Data.find().limit(20000)
     .then(async (data) => {
       console.log(data);
       res.json(data);

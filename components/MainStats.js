@@ -37,7 +37,8 @@ class MainStats extends Component {
             dailyCases: 0,
             selectedDate: 0,
             lastSevenDays:[0,0,0,0,0,0,0,0,0],
-            lastSevenDaysLabels:[" "," "]
+            lastSevenDaysLabels:[" "," "],
+            fullData:[],
         };
     }
 
@@ -123,6 +124,7 @@ class MainStats extends Component {
                 genderCount[data[i].Sex]++;
             }
         }
+        console.log(genderCount)
         this.setState({ genderCases: JSON.stringify(genderCount) });
     }
 
@@ -199,8 +201,8 @@ class MainStats extends Component {
     filterData(startDate, endDate) {
         let start = 0;
         let end = 1;
-        for (let i = 0; i < this.state.savedData.length; i++) {
-            let compareDate = new Date(this.state.savedData[i].Reported_Date);
+        for (let i = 0; i < this.state.fullData.length; i++) {
+            let compareDate = new Date(this.state.fullData[i].Reported_Date);
             if (compareDate < this.formatDate(startDate)) {
                 start = i + 1;
             }
@@ -209,8 +211,8 @@ class MainStats extends Component {
                 end = i;
             }
         }
-        console.log(this.state.savedData.slice(start,end))
-        return this.state.savedData.slice(start,end)
+        console.log(this.state.fullData.slice(start,end))
+        return this.state.fullData.slice(start,end)
     }
 
     
@@ -220,8 +222,8 @@ class MainStats extends Component {
         UserDate.setDate(UserDate.getDate() - 1)
         let start = 0;
         let end = 1;
-        for (let i = 0; i < this.state.savedData.length; i++) {
-            let compareDate = new Date(this.state.savedData[i].Reported_Date);
+        for (let i = 0; i < this.state.fullData.length; i++) {
+            let compareDate = new Date(this.state.fullData[i].Reported_Date);
             if (compareDate <= UserDate) {
                 start = i + 1;
             }
@@ -229,35 +231,30 @@ class MainStats extends Component {
             if (compareDate < EndUserDate) {
                 end = i;
             }
-        }/*
-        for (let i = start;i<=end;i++){
-            splitArray.push(this.state.savedData[i])
         }
-
-        //console.log(UserDate,EndUserDate)
-        //console.log(start,end)
-        //console.log(this.state.savedData[start])
-        //console.log(this.state.savedData[end])
-        connsole.log(splitArray[0], splitArray[splitArray.length - 1])*/
-
-        //+1 since slice doesn't take last index
-        return this.state.savedData.slice(start,end+1)
+        return this.state.fullData.slice(start,end+1)
     }
 
     dateConfirmHandler = (date) => {
         //time in milliseconds
         var timezoneAdjustment = 28800000;
         date.setTime(date.getTime()-timezoneAdjustment)
+        if(this.state.fullData.length == 0){
          axios
              .get("https://mainstats.herokuapp.com/data", { withCredentials: true })
              .then((response) => {
                  this.setState({ savedData: response.data });
-                 this.setState({selectedDate: date.toString()})
+                 this.setState({ fullData: response.data });
                  var filteredDates = this.filterDataOnDay(date)
                  this.setState({dailyCases: filteredDates.length});
                  
-             })
-        console.warn("A date has been picked: ", date);
+             }).catch(error => console.error('(1) Inside error:', error))
+            } else {
+                var filteredDates = this.filterDataOnDay(date)
+                this.setState({dailyCases: filteredDates.length});
+        }
+        this.setState({selectedDate: date.toString()})
+        console.warn("A date has been picked: ", date);     
         this.setState({ isDatePickerVisible: false });
     }
 
