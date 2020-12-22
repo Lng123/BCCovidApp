@@ -16,3 +16,4 @@ backend/node_modules
 backend/.env
 debug.log
 package-lock.json
+debug.log
