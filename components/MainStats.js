@@ -14,6 +14,11 @@ import {
 import { Asset } from 'expo-asset';
 import { AppLoading } from 'expo';
 
+// global variables for breakpoints in data
+// first breakpoint: 30,000 or so cases from start of data to November 30, 2020.
+// next projected breakpoint: 60,000 cases by end of 2020.
+const firstDataBreakpoint = new Date("2020-11-30");
+
 class MainStats extends Component {
     constructor(props) {
         super(props);
@@ -21,6 +26,8 @@ class MainStats extends Component {
             isReady1: false,
             isReady2: false,
             isReady3: false,
+            isReady4: false,
+            isReady5: false,
             savedData: {},
             reportedDate: 1,
             ha: 2,
@@ -38,9 +45,12 @@ class MainStats extends Component {
             selectedDate: 0,
             lastSevenDays: [0, 0, 0, 0, 0, 0, 0, 0, 0],
             lastSevenDaysLabels: [" ", " "],
-            fullData: [],
+            latestSegmentData: [],
+            archivedSegmentData: []
         };
     }
+
+
 
     // pass in the number of cases
     totalCases(data) {
@@ -174,6 +184,32 @@ class MainStats extends Component {
                 this.setState({ isReady1: true })
 
             });
+        if (!this.state.latestSegmentData.length) {
+            axios
+                .get("https://mainstats.herokuapp.com/data", { withCredentials: true })
+                .then((response) => {
+                    console.warn("Called to heroku for the current data.");
+                    this.setState({
+                        isReady4: true,
+                        savedData: response.data,
+                        latestSegmentData: response.data
+                    });
+                });
+            // .catch(error => console.error('(1) Inside error:', error));
+        }
+        if (!this.state.archivedSegmentData.length) {
+            axios
+                .get("https://mainstats.herokuapp.com/dataArchive", { withCredentials: true })
+                .then((response) => {
+                    console.warn("Called to heroku for the archived data.");
+                    this.setState({
+                        isReady5: true,
+                        savedData: response.data,
+                        archivedSegmentData: response.data
+                    });
+                });
+            // .catch(error => console.error('(1) Inside error:', error));
+        }
 
 
     }
@@ -198,25 +234,26 @@ class MainStats extends Component {
         });
     }
 
-    filterData(startDate, endDate) {
-        let start = 0;
-        let end = 1;
-        for (let i = 0; i < this.state.fullData.length; i++) {
-            let compareDate = new Date(this.state.fullData[i].Reported_Date);
-            if (compareDate < this.formatDate(startDate)) {
-                start = i + 1;
-            }
+    // filterData(startDate, endDate) {
+    //     let start = 0;
+    //     let end = 1;
+    //     for (let i = 0; i < this.state.latestSegmentData.length; i++) {
+    //         let compareDate = new Date(this.state.latestSegmentData[i].Reported_Date);
+    //         if (compareDate < this.formatDate(startDate)) {
+    //             start = i + 1;
+    //         }
 
-            if (compareDate < this.formatDate(endDate)) {
-                end = i;
-            }
-        }
-        console.log(this.state.fullData.slice(start, end))
-        return this.state.fullData.slice(start, end)
-    }
+    //         if (compareDate < this.formatDate(endDate)) {
+    //             end = i;
+    //         }
+    //     }
+    //     console.log(this.state.latestSegmentData.slice(start, end))
+    //     return this.state.latestSegmentData.slice(start, end)
+    // }
 
 
-    filterDataOnDay(UserDate) {
+    // data can be latestSegmentData or archivedSegmentData
+    filterDataOnDay(UserDate, segmentData) {
         let date = UserDate.toString();
         date = new Date(date);
         date.setHours(0, 0, 0, 0);
@@ -224,8 +261,8 @@ class MainStats extends Component {
         date.setDate(date.getDate() - 1);
         let start = 0;
         let end = 1;
-        for (let i = 0; i < this.state.fullData.length; i++) {
-            let compareDate = new Date(this.state.fullData[i].Reported_Date);
+        for (let i = 0; i < segmentData.length; i++) {
+            let compareDate = new Date(segmentData[i].Reported_Date);
             if (compareDate <= date) {
                 start = i + 1;
             }
@@ -234,7 +271,7 @@ class MainStats extends Component {
                 end = i;
             }
         }
-        return this.state.fullData.slice(start, end + 1)
+        return segmentData.slice(start, end + 1)
     }
 
     dateConfirmHandler = (date) => {
@@ -244,21 +281,14 @@ class MainStats extends Component {
         // console.warn("Selected date: ", dateSelected);
         // dateSelected.setTime(dateSelected.getTime() - timezoneAdjustment);
         // console.warn("After adjustment: ", dateSelected);
-        if (this.state.fullData.length == 0) {
-            axios
-                .get("https://mainstats.herokuapp.com/data", { withCredentials: true })
-                .then((response) => {
-                    this.setState({ savedData: response.data });
-                    this.setState({ fullData: response.data });
-                    var filteredDates = this.filterDataOnDay(dateSelected)
-                    this.setState({ dailyCases: filteredDates.length });
-
-                }).catch(error => console.error('(1) Inside error:', error))
+        if (dateSelected > firstDataBreakpoint) {
+            var filteredDates = this.filterDataOnDay(dateSelected, this.state.latestSegmentData)
+            this.setState({ dailyCases: filteredDates.length });
         } else {
-            var filteredDates = this.filterDataOnDay(dateSelected)
+            var filteredDates = this.filterDataOnDay(dateSelected, this.state.archivedSegmentData);
             this.setState({ dailyCases: filteredDates.length });
         }
-        this.setState({ selectedDate: dateSelected.toString() })
+        this.setState({ selectedDate: dateSelected.toString() });
         console.warn("A date has been picked: ", dateSelected);
         this.setState({ isDatePickerVisible: false });
     }
