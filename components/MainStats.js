@@ -26,6 +26,8 @@ class MainStats extends Component {
             isReady1: false,
             isReady2: false,
             isReady3: false,
+            isReady4: false,
+            isReady5: false,
             savedData: {},
             reportedDate: 1,
             ha: 2,
@@ -48,7 +50,7 @@ class MainStats extends Component {
         };
     }
 
-   
+
 
     // pass in the number of cases
     totalCases(data) {
@@ -182,6 +184,32 @@ class MainStats extends Component {
                 this.setState({ isReady1: true })
 
             });
+        if (!this.state.latestSegmentData.length) {
+            axios
+                .get("https://mainstats.herokuapp.com/data", { withCredentials: true })
+                .then((response) => {
+                    console.warn("Called to heroku for the current data.");
+                    this.setState({
+                        isReady4: true,
+                        savedData: response.data,
+                        latestSegmentData: response.data
+                    });
+                });
+            // .catch(error => console.error('(1) Inside error:', error));
+        }
+        if (!this.state.archivedSegmentData.length) {
+            axios
+                .get("https://mainstats.herokuapp.com/dataArchive", { withCredentials: true })
+                .then((response) => {
+                    console.warn("Called to heroku for the archived data.");
+                    this.setState({
+                        isReady5: true,
+                        savedData: response.data,
+                        archivedSegmentData: response.data
+                    });
+                });
+            // .catch(error => console.error('(1) Inside error:', error));
+        }
 
 
     }
@@ -253,41 +281,14 @@ class MainStats extends Component {
         // console.warn("Selected date: ", dateSelected);
         // dateSelected.setTime(dateSelected.getTime() - timezoneAdjustment);
         // console.warn("After adjustment: ", dateSelected);
-        if(dateSelected > firstDataBreakpoint){
-            if (this.state.latestSegmentData.length == 0) {
-                axios
-                    .get("https://mainstats.herokuapp.com/data", { withCredentials: true })
-                    .then((response) => {
-                        console.warn("Called to heroku for the first time");
-                        this.setState({ savedData: response.data });
-                        this.setState({ latestSegmentData: response.data });
-                        var filteredDates = this.filterDataOnDay(dateSelected, this.state.latestSegmentData);
-                        this.setState({ dailyCases: filteredDates.length });
-    
-                    }).catch(error => console.error('(1) Inside error:', error))
-            } else {
-                var filteredDates = this.filterDataOnDay(dateSelected, this.state.latestSegmentData)
-                this.setState({ dailyCases: filteredDates.length });
-            }
+        if (dateSelected > firstDataBreakpoint) {
+            var filteredDates = this.filterDataOnDay(dateSelected, this.state.latestSegmentData)
+            this.setState({ dailyCases: filteredDates.length });
         } else {
-            if (this.state.archivedSegmentData.length == 0) {
-                axios
-                    .get("https://mainstats.herokuapp.com/dataArchive", { withCredentials: true })
-                    .then((response) => {
-                        console.warn("Called to heroku for the first time");
-                        this.setState({ savedData: response.data });
-                        this.setState({ archivedSegmentData: response.data });
-                        var filteredDates = this.filterDataOnDay(dateSelected, this.state.archivedSegmentData);
-                        this.setState({ dailyCases: filteredDates.length });
-    
-                    }).catch(error => console.error('(1) Inside error:', error))
-            } else {
-                var filteredDates = this.filterDataOnDay(dateSelected, this.state.archivedSegmentData);
-                this.setState({ dailyCases: filteredDates.length });
-            }
+            var filteredDates = this.filterDataOnDay(dateSelected, this.state.archivedSegmentData);
+            this.setState({ dailyCases: filteredDates.length });
         }
-       
-        this.setState({ selectedDate: dateSelected.toString() })
+        this.setState({ selectedDate: dateSelected.toString() });
         console.warn("A date has been picked: ", dateSelected);
         this.setState({ isDatePickerVisible: false });
     }
