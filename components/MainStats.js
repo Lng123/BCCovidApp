@@ -173,7 +173,16 @@ class MainStats extends Component {
             .get("https://mainstats.herokuapp.com/gender", { withCredentials: true })
             .then((response) => {
                 var females = response.data[1].count;
+                
                 var males = response.data[2].count;
+                for (let i = 0; i < response.data.length; i++){
+                    if (response.data[i]._id == "M"){
+                        males = response.data[i].count
+                    }
+                    if (response.data[i]._id == "F"){
+                        females = response.data[i].count
+                    }
+                }
 
                 // this.setState({genderCases:JSON.stringify(response.data)})
                 this.setState({ genderCases: "Female Cases: " + females + "\nMale Cases: " + males })
