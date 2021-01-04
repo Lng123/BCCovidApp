@@ -1,6 +1,6 @@
 import { StatusBar } from "expo-status-bar";
 import React, { Component, useState } from "react";
-import { Dimensions, StyleSheet, Text, View, Button, TouchableWithoutFeedbackBase } from "react-native";
+import { Dimensions, StyleSheet, Text, View, Button, TouchableWithoutFeedbackBase, RecyclerViewBackedScrollViewComponent } from "react-native";
 import axios from "axios";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import {
@@ -14,10 +14,12 @@ import {
 import { Asset } from 'expo-asset';
 import { AppLoading } from 'expo';
 
+
 // global variables for breakpoints in data
 // first breakpoint: 30,000 or so cases from start of data to November 30, 2020.
 // next projected breakpoint: 60,000 cases by end of 2020.
 const firstDataBreakpoint = new Date("2020-11-30");
+const dataArchive = require('../backend/data-archive.json');
 
 const styles = StyleSheet.create({
     container: {
@@ -61,7 +63,7 @@ class MainStats extends Component {
             lastSevenDays: [0, 0, 0, 0, 0, 0, 0, 0, 0],
             lastSevenDaysLabels: [" ", " "],
             latestSegmentData: [],
-            archivedSegmentData: []
+            archivedSegmentData: dataArchive
         };
     }
 
@@ -221,30 +223,9 @@ class MainStats extends Component {
                 });
             // .catch(error => console.error('(1) Inside error:', error));
         }
-        if (!this.state.archivedSegmentData.length) {
-            axios
-                .get("https://mainstats.herokuapp.com/dataArchive", { withCredentials: true })
-                .then((response) => {
-                    console.warn("Called to heroku for the archived data.");
-                    this.setState({
-                        isReady5: true,
-                        savedData: response.data,
-                        archivedSegmentData: response.data
-                    });
-                });
-            // .catch(error => console.error('(1) Inside error:', error));
-        }
 
 
     }
-
-    componentDidMount() {
-        //console.log(this.state.isReady)
-        //this.loadData();
-    }
-    /*componentDidUpdate(){
-        this.filterData();
-      }*/
 
     searchInData() {
         //console.log("searchInData()");
@@ -257,24 +238,6 @@ class MainStats extends Component {
             classification: this.state.savedData[0].Classification_Reported,
         });
     }
-
-    // filterData(startDate, endDate) {
-    //     let start = 0;
-    //     let end = 1;
-    //     for (let i = 0; i < this.state.latestSegmentData.length; i++) {
-    //         let compareDate = new Date(this.state.latestSegmentData[i].Reported_Date);
-    //         if (compareDate < this.formatDate(startDate)) {
-    //             start = i + 1;
-    //         }
-
-    //         if (compareDate < this.formatDate(endDate)) {
-    //             end = i;
-    //         }
-    //     }
-    //     console.log(this.state.latestSegmentData.slice(start, end))
-    //     return this.state.latestSegmentData.slice(start, end)
-    // }
-
 
     // data can be latestSegmentData or archivedSegmentData
     filterDataOnDay(UserDate, segmentData) {
