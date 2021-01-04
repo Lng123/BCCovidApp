@@ -19,6 +19,21 @@ import { AppLoading } from 'expo';
 // next projected breakpoint: 60,000 cases by end of 2020.
 const firstDataBreakpoint = new Date("2020-11-30");
 
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        padding: 24,
+        backgroundColor: "#ffffff"
+    },
+    title: {
+        marginTop: 16,
+        paddingVertical: 8,
+        color: "#20232a",
+        fontSize: 18,
+        fontWeight: "bold"
+    }
+});
+
 class MainStats extends Component {
     constructor(props) {
         super(props);
@@ -310,15 +325,14 @@ class MainStats extends Component {
             );
         }
         return (
-            <View>
+            <View style={styles.container}>
                 <View>
-                    <Text>CASES BY GENDER</Text>
+                    <Text style={styles.title}>CASES BY GENDER</Text>
                     <Text>{this.state.genderCases}</Text>
-                    <Text>CASES BY REGION</Text>
+                    <Text style={styles.title}>CASES BY REGION</Text>
                     <Text>{this.state.region}</Text>
-                    <Text>NEW CASES IN THE LAST SEVEN DAYS:</Text>
+                    <Text style={styles.title}>NEW CASES IN THE LAST SEVEN DAYS</Text>
                     <Text>{this.state.newCases}</Text>
-                    {/* <Text>New Cases (Seven): {this.state.lastSevenDays.toString()}</Text> */}
                 </View>
                 <View>
                     <Button title="Show Date Picker" onPress={() => this.setState({ isDatePickerVisible: true })} />
